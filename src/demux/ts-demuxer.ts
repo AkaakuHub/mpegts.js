@@ -1236,6 +1236,10 @@ class TSDemuxer extends BaseDemuxer {
             let pps_without_header = this.video_metadata_.pps.data.subarray(4);
             let hvcc = new HEVCDecoderConfigurationRecord(vps_without_header, sps_without_header, pps_without_header, details);
             meta.hvcc = hvcc.getData();
+            meta.colourPrimaries = details.colour_primaries;
+            meta.transferCharacteristics = details.transfer_characteristics;
+            meta.matrixCoefficients = details.matrix_coeffs;
+            meta.fullRange = details.video_full_range_flag;
 
             if (this.video_init_segment_dispatched_ == false) {
                 Log.v(this.TAG, `Generated first HEVCDecoderConfigurationRecord for mimeType: ${meta.codec}`);

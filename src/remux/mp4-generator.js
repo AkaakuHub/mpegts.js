@@ -24,7 +24,7 @@ class MP4 {
         MP4.types = {
             avc1: [], avcC: [], btrt: [], dinf: [],
             dref: [], esds: [], ftyp: [], hdlr: [],
-            hvc1: [], hvcC: [], av01: [], av1C: [],
+            hvc1: [], hvcC: [], colr: [], av01: [], av1C: [],
             mdat: [], mdhd: [], mdia: [], mfhd: [],
             minf: [], moof: [], moov: [], mp4a: [],
             mvex: [], mvhd: [], sdtp: [], stbl: [],
@@ -692,7 +692,17 @@ class MP4 {
             0x00, 0x18,              // depth
             0xFF, 0xFF               // pre_defined = -1
         ]);
-        return MP4.box(MP4.types.hvc1, data, MP4.box(MP4.types.hvcC, hvcc));
+        return MP4.box(MP4.types.hvc1, data, MP4.box(MP4.types.hvcC, hvcc), MP4.colr(meta));
+    }
+
+    static colr(meta) {
+        return MP4.box(MP4.types.colr, new Uint8Array([
+            0x6E, 0x63, 0x6C, 0x78,
+            (meta.colourPrimaries >>> 8) & 0xFF, meta.colourPrimaries & 0xFF,
+            (meta.transferCharacteristics >>> 8) & 0xFF, meta.transferCharacteristics & 0xFF,
+            (meta.matrixCoefficients >>> 8) & 0xFF, meta.matrixCoefficients & 0xFF,
+            meta.fullRange ? 0x80 : 0x00
+        ]));
     }
 
     static av01(meta) {

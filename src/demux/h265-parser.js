@@ -221,6 +221,7 @@ class H265NaluParser {
         let sps_temporal_mvp_enabled_flag = gb.readBool();
         let strong_intra_smoothing_enabled_flag = gb.readBool();
         let vui_parameters_present_flag = gb.readBool();
+        let video_full_range_flag = false;
         let colour_primaries = 2;
         let transfer_characteristics = 2;
         let matrix_coeffs = 2;
@@ -247,7 +248,7 @@ class H265NaluParser {
             let video_signal_type_present_flag = gb.readBool();
             if (video_signal_type_present_flag) {
                 gb.readBits(3);
-                gb.readBool();
+                video_full_range_flag = gb.readBool();
                 let colour_description_present_flag = gb.readBool();
                 if (colour_description_present_flag) {
                     colour_primaries = gb.readByte();
@@ -424,6 +425,7 @@ class H265NaluParser {
             bit_depth_luma_minus8,
             bit_depth_chroma_minus8,
 
+            video_full_range_flag,
             colour_primaries,
             transfer_characteristics,
             matrix_coeffs,
