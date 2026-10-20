@@ -1502,6 +1502,10 @@ class FLVDemuxer {
                     let sps = new Uint8Array(arrayBuffer, dataOffset + offset, len);
 
                     let config = H265Parser.parseSPS(sps);
+                    meta.colourPrimaries = config.colour_primaries;
+                    meta.transferCharacteristics = config.transfer_characteristics;
+                    meta.matrixCoefficients = config.matrix_coeffs;
+                    meta.fullRange = config.video_full_range_flag;
                     meta.codecWidth = config.codec_size.width;
                     meta.codecHeight = config.codec_size.height;
                     meta.presentWidth = config.present_size.width;
