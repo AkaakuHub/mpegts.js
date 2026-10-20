@@ -358,7 +358,29 @@ class H265NaluParser {
         let sps_extension_flag = gb.readBool(); // ignore...
 
         // for meta data
-        let codec_mimetype = `hvc1.${general_profile_idc}.1.L${general_level_idc}.B0`;
+        const profile_space = ['', 'A', 'B', 'C'][general_profile_space];
+        let compatibility_flags = ((general_profile_compatibility_flags_1 << 24) |
+                                   (general_profile_compatibility_flags_2 << 16) |
+                                   (general_profile_compatibility_flags_3 << 8) |
+                                   general_profile_compatibility_flags_4) >>> 0;
+        let reversed_compatibility_flags = 0;
+        // ISO/IEC 14496-15 Annex E.3 encodes compatibility flags in reverse bit order.
+        for (let bit = 0; bit < 32; bit++) {
+            reversed_compatibility_flags = (reversed_compatibility_flags << 1) | (compatibility_flags & 1);
+            compatibility_flags >>>= 1;
+        }
+        const compatibility = (reversed_compatibility_flags >>> 0).toString(16).toUpperCase();
+        const tier = general_tier_flag ? 'H' : 'L';
+        const constraint_flags = [
+            general_constraint_indicator_flags_1, general_constraint_indicator_flags_2,
+            general_constraint_indicator_flags_3, general_constraint_indicator_flags_4,
+            general_constraint_indicator_flags_5, general_constraint_indicator_flags_6
+        ];
+        while (constraint_flags.length > 0 && constraint_flags[constraint_flags.length - 1] === 0) {
+            constraint_flags.pop();
+        }
+        const constraints = constraint_flags.map(value => `.${value.toString(16).padStart(2, '0').toUpperCase()}`).join('');
+        let codec_mimetype = `hvc1.${profile_space}${general_profile_idc}.${compatibility}.${tier}${general_level_idc}${constraints}`;
 
         let sub_wc = (chroma_format_idc === 1 || chroma_format_idc === 2) ? 2 : 1;
         let sub_hc = (chroma_format_idc === 1) ? 2 : 1;
